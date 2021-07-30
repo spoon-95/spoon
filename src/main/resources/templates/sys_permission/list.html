@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <link rel="stylesheet" media="all" th:href="@{/css/public.css}">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">用户姓名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="username" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">权限id</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="permissionId" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">权限名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="name" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">权限描述</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="description" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">权限访问路径</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="url" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">权限标识</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="perms" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">父级权限id</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="parentId" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label>类型 0：目录 1：菜单 2：按钮：</label>
+                            <select name="type">
+                                <option value="">所有</option>
+                                <option value="-1">代码生成请选择字典属性</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">排序</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="orderNum" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">图标</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="icon" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label>状态：1有效；2删除：</label>
+                            <select name="status">
+                                <option value="">所有</option>
+                                <option value="-1">代码生成请选择字典属性</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline">
+                            <a type="submit" class="layui-btn layui-btn-primary" lay-submit
+                               lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </a>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="reset" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-refresh-btn"><i class="layui-icon layui-icon-refresh"></i> 重置
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="permissionTable" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+        </script>
+
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.5.5/layui.js}"></script>
+<script>
+    var prefix = "/sysPermission";
+
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            method: 'POST',
+            elem: '#permissionTable',
+            url: prefix + '/list',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [
+                [
+                    {type: "checkbox", width: 50},
+                    {
+                        field: 'id',
+                        title: 'ID',
+                        sort: true
+                    },
+                    {
+                        field: 'permissionId',
+                        title: '权限id'
+                    },
+                    {
+                        field: 'name',
+                        title: '权限名称'
+                    },
+                    {
+                        field: 'description',
+                        title: '权限描述'
+                    },
+                    {
+                        field: 'url',
+                        title: '权限访问路径'
+                    },
+                    {
+                        field: 'perms',
+                        title: '权限标识'
+                    },
+                    {
+                        field: 'parentId',
+                        title: '父级权限id'
+                    },
+                    {
+                        field: 'type',
+                        title: '类型   0：目录   1：菜单   2：按钮'
+                    },
+                    {
+                        field: 'orderNum',
+                        title: '排序'
+                    },
+                    {
+                        field: 'icon',
+                        title: '图标'
+                    },
+                    {
+                        field: 'status',
+                        title: '状态：1有效；2删除'
+                    },
+
+                ]
+            ],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 15,
+            page: true,
+            skin: 'line'
+        });
+
+        // 格式化
+        function dictFormat(d) {
+
+        }
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            var result = JSON.stringify(data.field);
+            //执行搜索重载
+            table.reload('permissionTable', {
+                url: prefix + '/list',
+                where: JSON.parse(result)
+            });
+        });
+
+        // 监听重置操作
+        form.on('submit(data-refresh-btn)', function (data) {
+            //执行搜索重载
+            table.reload('permissionTable', {
+                url: prefix + '/list',
+                where: ''
+            });
+        });
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: prefix + '/add',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+
+                var checkStatus = table.checkStatus('permissionTable')
+                    , data = checkStatus.data, ids = new Array();
+                if (data.length == 0) {
+                    layer.msg("请至少选择一条记录");
+                    return;
+                }
+                for (var i = 0; i < data.length; i++) {
+                    ids.push(data[i].id);
+                }
+                layer.confirm("确认要删除选中的" + data.length + "条数据吗?", function (index) {
+                    $.ajax({
+                        url: prefix + '/remove',
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            ids: ids.toString()
+                        },
+                        success: function (result) {
+                            location.reload();
+                            layer.close(index);
+                        }
+                    });
+                });
+
+            }
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            //console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+
+                var index = layer.open({
+                    title: '编辑用户',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: prefix + '/edit/' + data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: prefix + '/remove/' + data.id,
+                        type: 'GET',
+                        success: function (result) {
+                            location.reload();
+                            layer.close(index);
+                        }
+                    });
+                });
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

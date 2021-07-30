@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "name": "zzz",
+    "open": true,
+    "children": [
+      {
+        "id": 2,
+        "name": "1",
+
+
+        "children": [
+          {
+            "id": 22,
+            "name": "1-1",
+
+
+            "children": [
+              {
+                "id": 32,
+                "name": "1-1-1"
+
+
+              },
+              {
+                "id": 33,
+                "name": "1-1-2"
+
+
+              }
+            ]
+          },
+          {
+            "id": 23,
+            "name": "1-2"
+
+
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "2"
+
+
+      },
+      {
+        "id": 17,
+        "name": "3z"
+
+
+      }
+    ]
+
+  },
+  {
+    "id": 4,
+    "name": "评论",
+
+    "children": [
+      {
+        "id": 5,
+        "name": "留言列表"
+
+
+      },
+      {
+        "id": 6,
+        "name": "发表留言"
+
+
+      },
+      {
+        "id": 333,
+        "name": "233333"
+
+
+      }
+    ]
+
+  },
+  {
+    "id": 10,
+    "name": "权限管理",
+
+    "children": [
+      {
+        "id": 8,
+        "name": "用户列表",
+
+        "children": [
+          {
+            "id": 40,
+            "name": "添加用户",
+
+            "url": null,
+            "title": "40",
+            "level": 2,
+            "check_Child_State": 0,
+            "check_Focus": false,
+            "checkedOld": false,
+            "dropInner": false,
+            "drag": false,
+            "parent": false
+          },
+          {
+            "id": 41,
+            "name": "编辑用户"
+
+
+          },
+          {
+            "id": 42,
+            "name": "删除用户"
+
+
+          }
+        ]
+
+      },
+      {
+        "id": 11,
+        "name": "角色列表"
+
+
+      },
+      {
+        "id": 13,
+        "name": "所有权限",
+
+        "children": [
+          {
+            "id": 34,
+            "name": "添加权限"
+
+
+          },
+          {
+            "id": 37,
+            "name": "编辑权限"
+
+
+          },
+          {
+            "id": 38,
+            "name": "删除权限"
+
+
+          }
+        ]
+
+      },
+      {
+        "id": 15,
+        "name": "操作日志"
+
+
+      }
+    ]
+
+  }
+]

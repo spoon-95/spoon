@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <link rel="stylesheet" media="all" th:href="@{/css/public.css}">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form" th:object="${sysPermission}">
+                                                                                                        <div class="layui-form-item">
+                        <label class="layui-form-label  required">权限id</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{permissionId}"  lay-verify="required" lay-reqtext="权限id不能为空"   placeholder="请输入权限id" value="" class="layui-input">
+                            <tip>填写权限id。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label  required">权限名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{name}"  lay-verify="required" lay-reqtext="权限名称不能为空"   placeholder="请输入权限名称" value="" class="layui-input">
+                            <tip>填写权限名称。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label ">权限描述</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{description}"    placeholder="请输入权限描述" value="" class="layui-input">
+                            <tip>填写权限描述。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label ">权限访问路径</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{url}"    placeholder="请输入权限访问路径" value="" class="layui-input">
+                            <tip>填写权限访问路径。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label ">权限标识</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{perms}"    placeholder="请输入权限标识" value="" class="layui-input">
+                            <tip>填写权限标识。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label ">父级权限id</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{parentId}"    placeholder="请输入父级权限id" value="" class="layui-input">
+                            <tip>填写父级权限id。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="form-group">
+                        <label class="col-sm-3 control-label">类型   0：目录   1：菜单   2：按钮：</label>
+                        <div class="col-sm-8">
+                            <select name="type" class="form-control m-b">
+                                <option value="">所有</option>
+                            </select>
+                            <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                        </div>
+                    </div>
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label ">排序</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{orderNum}"    placeholder="请输入排序" value="" class="layui-input">
+                            <tip>填写排序。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="layui-form-item">
+                        <label class="layui-form-label ">图标</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{icon}"    placeholder="请输入图标" value="" class="layui-input">
+                            <tip>填写图标。</tip>
+                        </div>
+                    </div>
+
+                                                                                                                                <div class="form-group">
+                        <label class="col-sm-3 control-label">状态：1有效；2删除：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box">
+                                <input type="radio" name="status" value="" required>
+                                <label th:for="status" th:text="未知"></label>
+                            </div>
+                            <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                        </div>
+                    </div>
+                                                                                                        
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.5.5/layui.js}"></script>
+<script>
+    var prefix = "/sysPermission"
+    layui.use(['form'], function () {
+        var form = layui.form,
+                layer = layui.layer,
+                $ = layui.$;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                url: prefix+'/add',
+                type: 'POST',
+                data: data.field,
+                success: function (result) {
+                    if (typeof callback == "function") {
+                        callback(result);
+                    }
+                    var iframeIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(iframeIndex);
+                    parent.parent[1].layui.table.reload('permissionTable', {
+                    });
+                    parent.parent[1].layer.msg("新增成功");
+                }
+            });
+        });
+
+    });
+</script>
+</body>
+</html>

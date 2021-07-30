@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wsp.spoon.mapper.SysMenuMapper">
+    <resultMap type="SysMenu" id="SysMenuResult">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="title" column="title"/>
+        <result property="name" column="title"/>
+        <result property="icon" column="icon"/>
+        <result property="href" column="href"/>
+        <result property="target" column="target"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="visible" column="visible"/>
+        <result property="level" column="level"/>
+    </resultMap>
+
+    <resultMap type="SysMenu" id="SysMenuResult1">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="title" column="title"/>
+        <result property="name" column="title"/>
+        <result property="icon" column="icon"/>
+        <result property="href" column="href"/>
+        <result property="target" column="target"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="visible" column="visible"/>
+        <result property="level" column="level"/>
+        <collection property="children" ofType="SysMenu" column="id" select="getMenuChildren"/>
+    </resultMap>
+
+    <insert id="insertSysMenu" parameterType="SysMenu" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_menu (
+        <if test="parentId != null">parent_id,</if>
+        <if test="title != null and title != '' ">title,</if>
+        <if test="icon != null and icon != '' ">icon,</if>
+        <if test="href != null and href != '' ">href,</if>
+        <if test="target != null and target != ''">target,</if>
+        <if test="orderNum != null">order_num,</if>
+        <if test="visible != null">visible,</if>
+        <if test="level != null">level</if>
+        )values(
+        <if test="parentId != null ">#{parentId},</if>
+        <if test="title != null and title != ''">#{title},</if>
+        <if test="icon != null and icon != ''">#{icon},</if>
+        <if test="href != null and href != ''">#{href},</if>
+        <if test="target != null and target != ''">#{target},</if>
+        <if test="orderNum != null">#{orderNum},</if>
+        <if test="visible != null">#{visible},</if>
+        <if test="level != null">#{level}</if>
+        )
+    </insert>
+
+
+    <update id="truncateMenu">
+        truncate table sys_menu
+    </update>
+
+
+    <select id="selectMenuList" resultMap="SysMenuResult">
+        SELECT *
+        FROM sys_menu
+    </select>
+
+
+    <!-- 先查询菜单根级目录 -->
+    <!-- 这里的返回结果必须为resultMap，并且值为上面构建的resultMap的id的值 -->
+    <select id="menuJson" resultMap="SysMenuResult1">
+        SELECT *
+        FROM sys_menu
+        WHERE parent_id = 0
+    </select>
+
+    <!-- 再利用上次查询结果colliection中column的值cid做递归查询，查出所有子菜单 -->
+    <!-- 这里的返回结果必须为resultMap，并且值为上面构建的resultMap的id的值 -->
+    <select id="getMenuChildren" resultMap="SysMenuResult">
+        SELECT *
+        FROM sys_menu
+        WHERE parent_id = #{id}
+          AND href is null
+    </select>
+
+
+    <select id="selectMenuById" resultMap="SysMenuResult">
+        SELECT *
+        FROM sys_menu
+        WHERE id = #{id}
+    </select>
+    <select id="selectMenuByPId" resultMap="SysMenuResult">
+        SELECT *
+        FROM sys_menu
+        WHERE parent_id = #{parentId}
+    </select>
+    <select id="selectByPIdRoleId" resultMap="SysMenuResult">
+        SELECT *
+        FROM sys_menu
+        WHERE parent_id = #{parentId} AND id IN
+        (
+            SELECT menu_id
+            FROM sys_role_menu
+            WHERE role_id=#{roleId}
+        )
+
+    </select>
+
+    <update id="updateMenu">
+        update sys_menu
+        <set>
+            <if test="parentId != null">parent_id=#{parentId},</if>
+            <if test="title != null and title != '' ">title=#{title},</if>
+            <if test="icon != null and icon != '' ">icon=#{icon},</if>
+            <if test="href != null and href != '' ">href=#{href},</if>
+            <if test="target != null and target != ''">target=#{target},</if>
+            <if test="orderNum != null">order_num=#{orderNum},</if>
+            <if test="visible != null">visible=#{visible},</if>
+            <if test="level != null">level=#{level}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMenuById" parameterType="int">
+        delete
+        from sys_menu
+        where id = #{id}
+           or parent_id = #{id}
+    </delete>
+
+
+</mapper>

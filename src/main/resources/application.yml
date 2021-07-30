@@ -1,0 +1,52 @@
+server:
+  port: 8085
+spring:
+  thymeleaf:
+    cache: false
+    mode: HTML
+    encoding: utf-8
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spoon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+
+
+mybatis:
+    # 搜索指定包别名
+    typeAliasesPackage: com.wsp.**.domain
+    # 配置mapper的扫描，找到所有的mapper.xml映射文件
+    mapperLocations: classpath*:mapper/**/*Mapper.xml
+    # 加载全局的配置文件
+    configLocation: classpath:mybatis/mybatis-config.xml
+
+# 日志配置
+logging:
+  level:
+    com.wsp: debug
+    org.springframework: warn
+
+#首页配置
+homeinfo:
+  title: 首页
+  href: page/welcome-1.html?t=1
+
+#图标配置
+logoinfo:
+  title: Cow System
+  image: images/cow.png
+  href:
+
+
+
+# PageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql

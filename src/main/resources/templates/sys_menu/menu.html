@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>menu</title>
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <link rel="stylesheet" media="all" th:href="@{/css/public.css}">
+    <style>
+        .layui-btn:not(.layui-btn-lg ):not(.layui-btn-sm):not(.layui-btn-xs) {
+            height: 34px;
+            line-height: 34px;
+            padding: 0 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <div class="layui-btn-container" style="display: inline-block;">
+            <a href="../../page/upload.html" class="layui-btn layui-btn-sm layui-btn-normal">
+                <i class="layui-icon">&#xe67d;</i>导入菜单
+            </a>
+        </div>
+        <div class="layui-btn-container" style="display: inline-block;">
+            <button id="btn-expand" class="layui-btn layui-btn-sm layui-btn-primary">
+                <i class="layui-icon">&#xe668;</i>展开全部
+            </button>
+            <button id="btn-fold" class="layui-btn layui-btn-sm layui-btn-primary">
+                <i class="layui-icon">&#xe66b;</i>折叠全部
+            </button>
+        </div>
+        <input class="layui-input" id="edtSearch" value="" placeholder="输入关键字"
+               style="display: inline-block;width: 140px;height: 30px;line-height: 30px;padding: 0 5px;margin-right: 5px;"/>
+        <div class="layui-btn-container" style="display: inline-block;">
+            <button id="btnSearch" class="layui-btn layui-btn-sm layui-btn-primary">
+                <i class="layui-icon">&#xe615;</i>搜索
+            </button>
+            <button id="btnClearSearch" class="layui-btn layui-btn-sm layui-btn-primary">
+                <i class="layui-icon">&#x1006;</i>清除搜索
+            </button>
+        </div>
+        <div>
+            <table id="munu-table" class="layui-table" lay-filter="munu-table"></table>
+        </div>
+    </div>
+</div>
+<!-- 操作列 -->
+<script type="text/html" id="auth-state">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script th:src="@{/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/js/lay-config.js?v=1.0.4s}"></script>
+<script>
+    layui.use(['table', 'treetable'], function () {
+        var $ = layui.jquery;
+        var table = layui.table;
+        var treetable = layui.treetable;
+        // 渲染表格
+        layer.load(2);
+        var insTb = treetable.render({
+            id: 'menuTable',
+            toolbar: 'default',
+            height: 'full-200',
+            treeColIndex: 1,
+            treeSpid: 0,
+            treeIdName: 'id',
+            treePidName: 'parentId',
+            elem: '#munu-table',
+            url: '/sysMenu/list',
+            page: false,
+            cols: [
+                [
+                    {type: 'numbers'},
+                    {field: 'title', minWidth: 200, title: '菜单名称'},
+                    {field: 'href', title: '菜单url'},
+                    {field: 'icon', title: '图标'},
+                    {templet: '#auth-state', width: 120, align: 'center', title: '操作'}
+                ]
+            ],
+            done: function () {
+                layer.closeAll('loading');
+            }
+        });
+        $('#btn-expand').click(function () {
+            treetable.expandAll('#munu-table');
+        });
+
+        $('#btn-fold').click(function () {
+            treetable.foldAll('#munu-table');
+        });
+        // 搜索
+        $('#btnSearch').click(function () {
+            debugger;
+            var keywords = $('#edtSearch').val();
+            if (keywords) {
+                treetable.filterData(keywords);
+            } else {
+                treetable.clearFilter();
+            }
+        });
+        //监听工具条
+        table.on('tool(munu-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: '/sysMenu/remove/' + data.id,
+                        type: 'GET',
+                        success: function (result) {
+                            location.reload();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if (layEvent === 'edit') {
+                var index = layer.open({
+                    title: '编辑菜单',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/sysMenu/edit/' + data.id,
+                    end: function () {
+                    }
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            }
+        });
+        // 头部工具栏点击事件
+        table.on('toolbar(munu-table)', function (obj) {
+            switch (obj.event) {
+                case 'add':
+                    var index = layer.open({
+                        title: '添加菜单',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['100%', '100%'],
+                        content: '/sysMenu/add/0/',
+                    });
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                    return false;
+                    break;
+                case 'delete':
+                    layer.msg('删除');
+                    break;
+                case 'update':
+                    layer.msg('编辑');
+                    break;
+                case 'LAYTABLE_TIPS':
+                    layer.msg('提示');
+                    break;
+            }
+        });
+    });
+</script>
+</body>
+</html>

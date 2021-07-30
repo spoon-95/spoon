@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <link rel="stylesheet" media="all" th:href="@{/css/public.css}">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form" th:object="${sysRole}">
+    <input name="id" type="hidden" th:field="*{id}"/>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色名称</label>
+        <div class="layui-input-block">
+            <input type="text" th:field="*{name}" lay-verify="required" lay-reqtext="名称不能为空" placeholder="请输入名称"
+                   value="" class="layui-input">
+            <tip>填写角色名称。</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择权限</label>
+        <div class="layui-input-block">
+            <div id="LAY-auth-tree-index" th:field="*{authids}"></div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色描述</label>
+        <div class="layui-input-block">
+            <input type="text" th:field="*{description}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="checkbox" checked="" th:field="*{flag}" lay-skin="switch" lay-filter="switchTest"
+                   lay-text="正常|禁用">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.5.5/layui.js}"></script>
+<script th:src="@{/js/lay-config.js?v=2.0.0}" charset="utf-8"></script>
+<script th:inline="javascript">
+    var sysRole = [[${sysRole}]];
+    layui.use(['form', 'authtree'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            authtree = layui.authtree,
+            $ = layui.$;
+        // 一般来说，权限数据是异步传递过来的
+        $.ajax({
+            //url: '../api/tree.json',
+            url: '/sysMenu/list',
+            dataType: 'json',
+            success: function (data) {
+                sysRole
+                var trees = authtree.listConvert(data.data, {
+                    primaryKey: 'id'
+                    , startPid: 0
+                    , parentKey: 'parentId'
+                    , nameKey: 'name'
+                    , valueKey: 'id'
+                    , checkedKey: sysRole.authids
+                });
+                // 如果后台返回的不是树结构，请使用 authtree.listConvert 转换
+                authtree.render('#LAY-auth-tree-index', trees, {
+                    inputname: 'authids[]',
+                    layfilter: 'lay-check-auth',
+                    autowidth: true,
+                });
+            }
+        });
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                url: '/sysRole/edit',
+                type: 'POST',
+                data: data.field,
+                success: function (result) {
+                    if (typeof callback == "function") {
+                        callback(result);
+                    }
+                    var iframeIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(iframeIndex);
+                    parent.parent[1].layui.table.reload('roleTable', {});
+                    parent.parent[1].layer.msg("编辑成功");
+                }
+            });
+        });
+
+    });
+</script>
+</body>
+</html>

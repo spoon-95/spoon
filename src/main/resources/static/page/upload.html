@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="../css/bootstrap.min.css" media="all" rel="stylesheet">
+    <link rel="stylesheet" href="../css/font-awesome.min.css" media="all" rel="stylesheet">
+
+    <link rel="stylesheet" href="../lib/bootstrap-table/bootstrap-table.min.css" media="all" rel="stylesheet">
+    <link rel="stylesheet" href="../css/animate.css" media="all" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css" media="all" rel="stylesheet">
+    <link rel="stylesheet" href="../css/ry-ui.css?v=4.3.1" media="all" rel="stylesheet">
+
+    <link rel="stylesheet" href="../lib/bootstrap-fileinput/fileinput.min.css" media="all" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>文件上传控件 <small>https://github.com/kartik-v/bootstrap-fileinput</small></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <label class="font-noraml">简单示例</label>
+                        <div class="file-loading">
+                            <input id="importMenu"  type="file" multiple data-min-file-count="1" data-theme="fas">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="font-noraml">多文件上传</label>
+                        <div class="file-loading">
+                            <input id="fileinput-demo-1" type="file" multiple>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label class="font-noraml">相关参数详细信息</label>
+                        <div><a href="http://doc.ruoyi.vip/ruoyi/document/zjwd.html#bootstrap-fileinput"
+                                target="_blank">http://doc.ruoyi.vip/ruoyi/document/zjwd.html#bootstrap-fileinput</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../lib/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+<script src="../lib/bootstrap/bootstrap.min.js"></script>
+<script src="../lib/bootstrap-fileinput/fileinput.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#importMenu").fileinput({
+            language: 'zh', //设置语言
+            uploadUrl: "/sysMenu/importMenu", //上传的地址
+            allowedFileExtensions: ['json'],//接收的文件后缀
+            uploadAsync: true, //默认异步上传
+            showUpload: true, //是否显示上传按钮
+            showRemove: true, //显示移除按钮
+            showPreview: true, //是否显示预览
+            showCaption: false,//是否显示标题
+            browseClass: "btn btn-primary", //按钮样式
+            dropZoneEnabled: false,//是否显示拖拽区域
+            maxFileCount: 1, //表示允许同时上传的最大文件个数
+            enctype: 'multipart/form-data',
+            validateInitialCount: true
+        });
+        //异步上传返回结果处理
+        $("#importMenu").on("fileuploaded", function (event, data, previewId, index) {
+
+            console.log(JSON.stringify(data));
+        });
+        $("#fileinput-demo-1").fileinput({
+            'theme': 'explorer-fas',
+            'uploadUrl': '#',
+            overwriteInitial: false,
+            initialPreviewAsData: true,
+            initialPreview: [
+                "/images/Levi.png",
+                "/images/Yeager.png"
+            ]
+        });
+
+
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wsp.spoon.mapper.SysUserMapper">
+    <resultMap type="SysUser" id="SysUserResult">
+        <id property="id" column="id"/>
+        <result property="userNo" column="user_no"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="roleId" column="role_id"/>
+    </resultMap>
+
+
+
+    <select id="findByUsername" parameterType="String" resultMap="SysUserResult">
+        select * from sys_user where username = #{username}
+    </select>
+    <select id="findById" parameterType="Int" resultMap="SysUserResult">
+        select * from sys_user where id=#{userId}
+    </select>
+    <select id="findByUsernameAndPwd" parameterType="String" resultMap="SysUserResult">
+        select * from sys_user where username = #{username} and password = #{pwd}
+    </select>
+
+    <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult">
+        select * from sys_user where 1=1
+        <if test="username != null and username != ''">
+            AND username like concat('%', #{username}, '%')
+        </if>
+        <if test="userNo != null and userNo != ''">
+            AND user_no like concat('%', #{userNo}, '%')
+        </if>
+        <if test="phone != null and phone != ''">
+            AND phone like concat('%', #{phone}, '%')
+        </if>
+    </select>
+
+
+    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_user (
+        <if test="userNo != null and userNo != '' ">user_no,</if>
+        <if test="username != null and username != '' ">username,</if>
+        <if test="password != null and password != '' ">password,</if>
+        <if test="salt != null and salt != '' ">salt,</if>
+        <if test="email != null and email != ''">email,</if>
+        <if test="phone != null and phone != ''">phone,</if>
+        <if test="sex != null">sex,</if>
+        <if test="age != null">age,</if>
+        <if test="status != null">status,</if>
+        <if test="updateTime != null">update_time,</if>
+        <if test="lastLoginTime != null">lastLogin_time,</if>
+        <if test="roleId != null">role_id,</if>
+        <if test="createTime != null">create_time</if>
+        )values(
+        <if test="userNo != null and userNo != '' ">#{userNo},</if>
+        <if test="username != null and username != '' ">#{username},</if>
+        <if test="password != null and password != '' ">#{password},</if>
+        <if test="salt != null and salt != '' ">#{salt},</if>
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="phone != null and phone != ''">#{phone},</if>
+        <if test="sex != null">#{sex},</if>
+        <if test="age != null">#{age},</if>
+        <if test="status != null">#{status},</if>
+        <if test="updateTime != null">#{updateTime},</if>
+        <if test="lastLoginTime != null">#{lastLoginTime},</if>
+        <if test="roleId != null">#{roleId},</if>
+        <if test="createTime != null">#{createTime}</if>
+        )
+    </insert>
+
+    <delete id="deleteUserById">
+        delete from sys_user where id = #{id}
+    </delete>
+    <delete id="deleteUserByIds">
+        delete from sys_user where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectUserById" resultMap="SysUserResult">
+        select * from sys_user where id = #{id}
+    </select>
+
+    <update id="updateUser">
+        update sys_user
+        <set>
+            <if test="userNo != null and userNo != '' ">user_no=#{userNo},</if>
+            <if test="username != null and username != '' ">username=#{username},</if>
+            <if test="password != null and password != '' ">password=#{password},</if>
+            <if test="salt != null and salt != '' ">salt=#{salt},</if>
+            <if test="email != null and email != ''">email=#{email},</if>
+            <if test="phone != null and phone != ''">phone=#{phone},</if>
+            <if test="sex != null">sex=#{sex},</if>
+            <if test="age != null">age=#{age},</if>
+            <if test="status != null">status=#{status},</if>
+            <if test="lastLoginTime != null">lastLogin_time=#{lastLoginTime},</if>
+            <if test="createTime != null">create_time=#{createTime},</if>
+            <if test="roleId != null">role_id=#{roleId},</if>
+            <if test="updateTime != null">update_time=#{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+</mapper>

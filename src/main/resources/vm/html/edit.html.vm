@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/lib/layui-v2.5.5/css/layui.css}" media="all">
+    <link rel="stylesheet" media="all" th:href="@{/css/public.css}">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form" th:object="${${businessName}}">
+    <input name="${pkColumn.javaField}" th:field="*{${pkColumn.javaField}}" type="hidden">
+    #foreach($column in $columns)
+        #if($column.edit && !$column.pk)
+            #if(($column.usableColumn) || (!$column.superColumn))
+                #set($parentheseIndex=$column.columnComment.indexOf("（"))
+                #if($parentheseIndex != -1)
+                    #set($comment=$column.columnComment.substring(0, $parentheseIndex))
+                #else
+                    #set($comment=$column.columnComment)
+                #end
+                #set($field=$column.javaField)
+                #set($dictType=$column.dictType)
+                #if("" != $treeParentCode && $column.javaField == $treeParentCode)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                #set($BusinessName=$businessName.substring(0,1).toUpperCase() + ${businessName.substring(1)})
+                                <input id="treeId" name="${treeParentCode}" type="hidden"
+                                       th:field="*{${treeParentCode}}"/>
+                                <input class="form-control" type="text" onclick="select${BusinessName}Tree()"
+                                       id="treeName" readonly="true" th:field="*{parentName}"#if($column.required)
+                                       required#end>
+                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "input")
+                    <div class="layui-form-item">
+                        <label class="layui-form-label #if($column.required) required#end">${comment}</label>
+                        <div class="layui-input-block">
+                            <input type="text" th:field="*{${field}}" #if($column.required) lay-verify="required" lay-reqtext="${comment}不能为空"#end   placeholder="请输入${comment}" value="" class="layui-input">
+                            <tip>填写${comment}。</tip>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "upload")
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label#if($column.required) is-required#end">${comment}
+                            ：</label>
+                        <div class="col-sm-8">
+                            <input type="hidden" name="${field}" th:field="*{${field}}">
+                            <div class="file-loading">
+                                <input class="form-control file-upload" id="${field}" name="file" type="file">
+                            </div>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "select" && "" != $dictType)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <select name="${field}" class="form-control m-b"
+                                    th:with="type=${@dict.getType('${dictType}')}"#if($column.required)
+                                    required#end>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}" th:field="*{${field}}"></option>
+                            </select>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "select" && $dictType)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <select name="${field}" class="form-control m-b"#if($column.required) required#end>
+                                <option value="">所有</option>
+                            </select>
+                            <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "checkbox" && "" != $dictType)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8" th:with="type=${@dict.getType('${dictType}')}">
+                            <label th:each="dict : ${type}" class="check-box">
+                                <input name="${field}" type="checkbox" th:value="${dict.dictValue}"
+                                       th:text="${dict.dictLabel}"
+                                       th:attr="checked=${${className}.${field}.contains(dict.dictValue)?true:false}"#if($column.required)
+                                       required#end>
+                            </label>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "checkbox" && $dictType)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <label class="check-box">
+                                <input name="${field}" type="checkbox"#if($column.required) required#end> 无
+                            </label>
+                            <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "radio" && "" != $dictType)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box" th:each="dict : ${@dict.getType('${dictType}')}">
+                                <input type="radio" th:id="${'${field}_' + dict.dictCode}" name="${field}"
+                                       th:value="${dict.dictValue}" th:field="*{${field}}"#if($column.required)
+                                       required#end>
+                                <label th:for="${'${field}_' + dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                            </div>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "radio" && $dictType)
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <div class="radio-box">
+                                <input type="radio" name="${field}" value=""#if($column.required) required#end>
+                                <label th:for="${field}" th:text="未知"></label>
+                            </div>
+                            <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 代码生成请选择字典属性</span>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "datetime")
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                            <div class="input-group date">
+                                <input name="${field}"
+                                       th:value="${#dates.format(${className}.${field}, 'yyyy-MM-dd')}"
+                                       class="form-control" placeholder="yyyy-MM-dd"
+                                       type="text"#if($column.required) required#end>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                #elseif($column.htmlType == "textarea")
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">${comment}：</label>
+                        <div class="col-sm-8">
+                                <textarea name="${field}" class="form-control"#if($column.required)
+                                          required#end>[[*{${field}}]]</textarea>
+                        </div>
+                    </div>
+                #end
+            #end
+        #end
+    #end
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script th:src="@{/lib/layui-v2.5.5/layui.js}"></script>
+<script th:inline="javascript">
+    var prefix = "${businessName}";
+        layui.use(['form'], function () {
+            var form = layui.form,
+                    layer = layui.layer,
+                    $ = layui.$;
+
+            //监听提交
+            form.on('submit(saveBtn)', function (data) {
+                $.ajax({
+                    url: prefix+'/edit',
+                    type: 'POST',
+                    data: data.field,
+                    success: function (result) {
+                        if (typeof callback == "function") {
+                            callback(result);
+                        }
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                        parent.parent[1].layui.table.reload('currentTableId', {
+                        });
+                        parent.parent[1].layer.msg("编辑成功");
+                    }
+                });
+            });
+
+        });
+</script>
+</body>
+</html>

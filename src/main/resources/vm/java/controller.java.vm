@@ -1,0 +1,109 @@
+package ${packageName}.controller;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.wsp.spoon.generator.annotation.Log;
+import com.wsp.spoon.generator.enums.BusinessType;
+import ${packageName}.domain.${ClassName};
+import ${packageName}.service.${ClassName}Service;
+import com.wsp.spoon.domain.AjaxResult;
+import com.wsp.spoon.page.TableDataInfo;
+
+
+/**
+ * ${functionName}Controller
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Controller
+@RequestMapping("/${businessName}")
+public class ${ClassName}Controller extends BaseController
+{
+    private String prefix = "${tableName}";
+
+    @Autowired
+    private ${ClassName}Service ${className}Service;
+
+    @GetMapping()
+    public String list()
+    {
+        return prefix + "/list";
+    }
+
+    /**
+     * 新增${functionName}
+     */
+    @GetMapping("/add")
+    public String add(ModelMap mmap)
+    {
+        mmap.put("${className}", new ${ClassName}());
+        return prefix + "/add";
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @GetMapping("/edit/{${pkColumn.javaField}}")
+    public String edit(@PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}, ModelMap mmap)
+    {
+        ${ClassName} ${className} = ${className}Service.select${ClassName}ById(${pkColumn.javaField});
+        mmap.put("${className}", ${className});
+        return prefix + "/edit";
+    }
+
+
+
+    /**
+     * 查询${functionName}列表
+     */
+    @PostMapping("/list")
+    @ResponseBody
+    public TableDataInfo list(${ClassName} ${className})
+    {
+        startPage();
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        return getDataTable(list);
+    }
+
+    /**
+     * 新增保存${functionName}
+     */
+    @Log(title = "${functionName}", businessType = BusinessType.INSERT)
+    @PostMapping("/add")
+    @ResponseBody
+    public AjaxResult addSave(${ClassName} ${className})
+    {
+        return toAjax(${className}Service.insert${ClassName}(${className}));
+    }
+
+    /**
+     * 修改保存${functionName}
+     */
+    @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
+    @PostMapping("/edit")
+    @ResponseBody
+    public AjaxResult editSave(${ClassName} ${className})
+    {
+        return toAjax(${className}Service.update${ClassName}(${className}));
+    }
+
+
+    /**
+     * 删除${functionName}
+     */
+    @Log(title = "${functionName}", businessType = BusinessType.DELETE)
+    @PostMapping( "/remove")
+    @ResponseBody
+    public AjaxResult remove(String ids)
+    {
+        return toAjax(${className}Service.delete${ClassName}ByIds(ids));
+    }
+}
