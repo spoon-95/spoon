@@ -24,8 +24,8 @@
 菜单管理  
 代码生成 
 
-代码生成参考[Ruoyi](http://www.ruoyi.vip/)  
-前端[layuimini](http://layuimini.99php.cn/)
+代码生成参考 [Ruoyi](http://www.ruoyi.vip/)  
+前端 [layuimini](http://layuimini.99php.cn/)
 
 
 
